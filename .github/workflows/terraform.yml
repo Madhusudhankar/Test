@@ -53,7 +53,7 @@ jobs:
 
       # Note: Cloud credentials/secrets must be configured for this stage
       - name: Real Terraform Init
-        run: terraform init
+        run: terraform init -backend=false
 
       - name: Terraform Plan
         run: terraform plan -out=tfplan
