@@ -1,0 +1,31 @@
+name: Terraform CI
+
+on:
+    push:
+    pull_request:
+
+jobs:
+    terraform:
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v4
+
+          - uses: hashicorp/setup-terraform@v3
+            
+          - name: init 
+            run: terraform init -backend=false
+
+          - name: Format
+            run: terraform fmt -check
+
+          - name: Validate
+            run: terraform validate
+
+          - name: setup TFLint
+            uses: terraform-linters/setup-tflint@v4
+
+          - name: TFLint
+            run: tflint
+
+
+
