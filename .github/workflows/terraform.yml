@@ -1,31 +1,59 @@
-name: Terraform CI
+name: Terraform CI/CD
 
 on:
-    push:
-    pull_request:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
 
 jobs:
-    terraform:
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@v6
+  # Stage 1: Static Analysis and Formatting
+  validate_and_lint:
+    name: Lint & Validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
 
-          - uses: hashicorp/setup-terraform@v4
-            
-          - name: init 
-            run: terraform init -backend=false
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_wrapper: false
 
-          - name: Format
-            run: terraform fmt -check
+      - name: Check Formatting
+        run: terraform fmt -check
 
-          - name: Validate
-            run: terraform validate
+      - name: Initialize (No Backend)
+        run: terraform init -backend=false
 
-          - name: setup TFLint
-            uses: terraform-linters/setup-tflint@v4
+      - name: Validate Configuration
+        run: terraform validate
 
-          - name: TFLint
-            run: tflint
-            
-          - name: Terraform Plan
-            run: terraform plan -input=false
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+
+      - name: Run TFLint
+        run: tflint
+
+  # Stage 2: Provisioning (Runs only if Stage 1 succeeds)
+  deploy:
+    name: Plan & Apply
+    runs-on: ubuntu-latest
+    needs: validate_and_lint
+    # Optional: Restrict apply to push events on main branches
+    # environment: production 
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_wrapper: false
+
+      # Note: Cloud credentials/secrets must be configured for this stage
+      - name: Real Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
