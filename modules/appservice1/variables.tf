@@ -1,12 +1,12 @@
-variable "name_prefix"{}
+variable "name_prefix" {}
 variable "location" {}
 variable "resource_group_name" {}
 variable "sku" {
-    default = "B1"
+  default = "B1"
 }
 variable "docker_image" {
-    default = "nginx"
+  default = "nginx"
 }
 variable "docker_tag" {
-    default = "latest"
+  default = "latest"
 }

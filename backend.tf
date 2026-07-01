@@ -4,6 +4,6 @@ terraform {
     storage_account_name = "uniqueuxtfstate"
     container_name       = "neuranxstate"
     key                  = "terraform.tfstate"
-    
+
   }
 }
